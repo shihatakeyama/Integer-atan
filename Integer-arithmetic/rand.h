@@ -5,8 +5,8 @@
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-
+Float64 drand();
 Float32 frand();			// 0Å`0.999999
 Float32 sfrand();			// -0.999999 Å` +0.999999
 Float32 Float32MaxRand();	// MIN_FLOAT Å` MAX_FLOAT
-
+Sint32 sirand();

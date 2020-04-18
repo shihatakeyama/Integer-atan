@@ -1,20 +1,25 @@
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // Arit_Uint32.c
 // 
-//  æ•´æ•°å‹å¤‰æ•°(int)ã‚’ä½¿ç”¨ã—ã¦atan()ã‚’è¨ˆç®—ã—ã¾ã™ã€‚
-//  CPUã®ç®—è¡“(æŒ‡æ•°ã€æ›ã‘ç®—ã€å‰²ã‚Šç®—)ã‚’ä½¿ã‚ãªã„ã§å®Ÿç¾ã™ã‚‹ã€‚
+//  ®”Œ^•Ï”(int)‚ğg—p‚µ‚Äatan()‚ğŒvZ‚µ‚Ü‚·B
+//  CPU‚ÌZp(w”AŠ|‚¯ZAŠ„‚èZ)‚ğg‚í‚È‚¢‚ÅÀŒ»‚·‚éB
 //  
 // 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-#include "stdafx.h"	// VC++ã®ãƒ—ãƒªã‚³ãƒ³ãƒ‘ã‚¤ãƒ« ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä½¿ç”¨ã™ã‚‹å ´åˆ
+#include "stdafx.h"	// VC++‚ÌƒvƒŠƒRƒ“ƒpƒCƒ‹ ƒwƒbƒ_[‚ğg—p‚·‚éê‡
 
+
+Float64 MY_atan_m(Float64 Tilt);
+
+Uint32 toUint32(const Float64 &I1);
+Float64 toFloat64(const Uint32 &I1);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-// 32Bit å‰²ã‚Šç®—ã‚’è¡Œã„ã¾ã™ã€‚ 
-// Numerator < Denominator (çœŸåˆ†æ•°)ã®é–¢ä¿‚ã‚’æº€ãŸã—ã¦ä¸‹ã•ã„ã€‚
-// Numeratortã¨Denominatorã®æœ€ä¸Šä½ãƒ“ãƒƒãƒˆã¯å¿…ãš0ã«ã—ã¦ä¸‹ã•ã„ã€‚
-// å‰²ã‚Šç®—ã—ãŸç­”ãˆã«0x100000000 ã‚’æ›ã‘ãŸå€¤ãŒæˆ»ã‚Šå€¤ã¨ã—ã¦æˆ»ã‚Šã¾ã™ã€‚
+// 32Bit Š„‚èZ‚ğs‚¢‚Ü‚·B 
+// I1 < I2 ‚ÌŠÖŒW‚ğ–‚½‚µ‚Ä‰º‚³‚¢B
+// I1‚ÆI2 ‚ÌÅãˆÊƒrƒbƒg‚Í•K‚¸0‚É‚µ‚Ä‰º‚³‚¢B
+// Š„‚èZ‚µ‚½“š‚¦‚É0x100000000 ‚ğŠ|‚¯‚½’l‚ª–ß‚è’l‚Æ‚µ‚Ä–ß‚è‚Ü‚·B
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 template<typename X>
 inline X Arit_divArd1(X I1 ,X I2)
@@ -38,9 +43,10 @@ inline X Arit_divArd1(X I1 ,X I2)
 
 	return ret;
 }
+#if 1
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-//  1ä»˜è¿‘ã®æ›ã‘ç®—  Around 1
-// åˆ†è§£èƒ½ 0x80000000 â†’ 1.0
+//  1•t‹ß‚ÌŠ|‚¯Z  Around 1
+// •ª‰ğ”\ 0x80000000 ¨ 1.0
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 Uint32 Arit_multArd1(const Uint32& I1, const Uint32 &I2)
 {
@@ -59,7 +65,7 @@ Uint32 Arit_multArd1(const Uint32& I1, const Uint32 &I2)
 			break;
 		}
 
-//		å››æ¨äº”å…¥
+//		lÌŒÜ“ü
 //		if(acum & 0x00000001)	acum += 2;
 
 		i++;
@@ -69,10 +75,35 @@ Uint32 Arit_multArd1(const Uint32& I1, const Uint32 &I2)
 
 	return acum;
 }
+#else
+Uint32 Arit_multArd1(const Uint32& I1, const Uint32 &I2)
+{
+	Sint32 i;
+	Uint64 acum = 0;
+	Uint32 msk = 1; 
+
+	i=0;
+	while(1){
+		
+		if(I2 & msk){
+			acum += (Uint64)I1 << i;
+		}
+
+		if(i >= (sizeof(Uint32)*8)-1){
+			break;
+		}
+
+		i++;
+		msk  <<= 1;
+	}
+
+	return (Uint32)(acum >> 31);
+}
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // Division
-// åˆ†è§£èƒ½ 1 â†’ 1.0
+// •ª‰ğ”\ 1 ¨ 1.0
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 Uint32 Arit_Div(const Uint32& I1, const Uint32 &I2)
 {
@@ -102,35 +133,39 @@ Uint32 Arit_Div(const Uint32& I1, const Uint32 &I2)
 		msk  >>= 1;
 	}
 
-	// å°‘æ•°ä»¥ä¸‹ã‚’å››æ¨äº”å…¥ã—ãŸã„å ´åˆ
+	// ­”ˆÈ‰º‚ğlÌŒÜ“ü‚µ‚½‚¢ê‡
 //	if((numerator<<1) >= denominator)	ans++;
 
 	return ans;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-// atan()
-// Tilt ï¼š y/x 0ï½0x7FFFFFFF  (0.99999999976) 
-//             åˆ†è§£èƒ½ 0x80000000 â†’ 1.0
-// return: / 0x80000000 rad
+// intŒ^®”‚ğg—p‚µ‚Äatan()‚ğŒvZ‚µ‚Ü‚·B
+//
+// @param
+// Tilt F atan(y/x) ‚Ìy/x‚Ì•”•ª
+//         y/xF 0`0x3FFFFFFF
+//         •ª‰ğ”\F 0x40000000 ¨ 1.0
+// return: / 0x20000000 rad
+//
+//  “à•”‚ÌŒvZ‚Í•ª‰ğ”\1bitã‚°‚Ä‚Ü‚·B
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 Uint32 Arit_atan_m(Uint32 Tilt)
 {
 	Uint32 adti,adti2,div;
 	Uint32 seki;
 	Uint32 n=1;
-	Uint32 thresh = 858993459;			// about 0.4pi
+	Uint32 thresh = 429496730;			// about 0.4
 	Uint32 accum=0;
 
 
-	if((Tilt > 0x7FFFFFFF))	return 0;	// ç®—å‡ºä¸èƒ½
+	if((Tilt > 0x40000000))	return 0;	// Zo•s”\
 
 	if(Tilt < thresh){
-		adti = Tilt;
+		adti = Tilt<<1;
 	}else{
-		// Tiltã®ã¾ã¾ã ã¨1.0ä»˜è¿‘ãŒåæŸã—ã«ãã„ã®ã§åŠ æ³•å®šç†ã‚’ä½¿ç”¨ã™ã‚‹ã€‚
-		adti = Arit_divArd1<Uint32>((0x80000000-Tilt)>>1 ,(0x80000000+Tilt)>>1) >> 1;
-//		adti = (Uint32)(((1.0-(Float64)Tilt/(Float64)0x80000000)/(1.0+(Float64)Tilt/(Float64)0x80000000)) * (Float64)0x80000000);
+		// Tilt‚Ì‚Ü‚Ü‚¾‚Æ1.0•t‹ß‚ªû‘©‚µ‚É‚­‚¢‚Ì‚Å‰Á–@’è—‚ğg—p‚·‚éB
+		adti = Arit_divArd1<Uint32>((0x40000000-Tilt) ,(0x40000000+Tilt)) >> 1;
 	}
 
 	seki = adti;
@@ -139,7 +174,6 @@ Uint32 Arit_atan_m(Uint32 Tilt)
 
 	while(1){
 
-//		arctan = seki / n;
 		div = Arit_Div(seki, n);
 
 		if(n & 0x02){
@@ -152,44 +186,62 @@ Uint32 Arit_atan_m(Uint32 Tilt)
 			break;		
 		}
 		if(n >= 40){
-			break;
+//			break;
 		}
 
 		seki = Arit_multArd1(seki , adti2);
 		n	+= 2;
+
 	}
 
 	if(Tilt < thresh){
-		return accum;
+		return accum>>2;
 	}else{
-		return (Uint32)(M_PI_4 * 0x80000000) - accum;
+		return (Uint32)(M_PI_4 * 0x20000000) - (accum>>2);
 	}
 }
+
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 // atan2()
-// å‹•ä½œæœªç¢ºèª 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Uint32 Arit_atan2_m(Uint32 y ,Uint32 x)
+Uint32 Arit_atan2(Sint32 y ,Sint32 x)
 {
 	Uint32 tilt;
+	Bool xm,ym;
 
-	tilt = Arit_divArd1<Uint32>(y ,x);
+	Uint32 absx = abs(x);
+	Uint32 absy = abs(y);
+	Sint32 atana,atana_bk;
 
-	return Arit_atan_m(tilt);
+	if(absx > absy){
+		tilt = Arit_divArd1<Uint32>(absy ,absx) >> 2;
+		atana = Arit_atan_m(tilt);
+	}else if(absx == absy){
+		// Arit_divArd1() ‚ª³‚µ‚­ŒvZ‚Å‚«‚È‚¢‚Ì‚ÅB
+		atana = Arit_atan_m(0x40000000);
+	}else{
+		tilt = Arit_divArd1<Uint32>(absx ,absy) >> 2;
+		atana = (Uint32)(M_PI_2 * 0x20000000) - (Arit_atan_m(tilt));
+	}
+	atana_bk = atana;
+
+	if(x<0){
+		atana = (Uint32)(M_PI * 0x20000000) - atana;
+	}
+
+	if(y<0){
+		atana = -atana;
+	}
+
+	return atana;
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-// æ¤œè¨¼é–¢æ•°
+// ŒŸØŠÖ”
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-void IntArti_DivTest()
-{
-	Uint32 ans;
-		
-	ans = Arit_Div(7, 1);
-
-}
-
 void Arti_AtanTest()
 {
 	Uint32 tilt,atn;
@@ -210,39 +262,96 @@ void Arti_AtanTest()
 
 	for(i=0;i<1000000;i++){
 
-		a = frand();
+		// ƒ‰ƒ“ƒ_ƒ€¶¬
+		a = drand();
 
 		// CPU calculation
 		c = atan(a);
 
 		// Discrete calculation
-		da = (Uint32)(a*0x80000000);
+		da = (Uint32)(a*0x40000000);// & 0xFFFFFFFC;
 		atn = Arit_atan_m(da);
-		dc = (Float64)atn / (Float64)0x80000000;
+		dc = (Float64)atn / (Float64)0x20000000;
 
 		// Error check
 		rate	= fabs(dc - c);
-		if(rate >= 0.0000001f){
+		if(rate >= 1e-8f){
 			// Place a breakpoint here and check for errors.
 			Uint32	panic = 1;
 		}
 		if(rate > errmax){
 			errmax = rate;
 		}
-//		printf("atan(%fl) = %fl rad error = %fl e-6\n", a ,dc,rate*10e+6);
+//--		printf("atan(%f) = %f rad error = %fl e-6\n", a ,dc,rate*10e+6);
 
 	}
 
-	printf("MaxError = %fl e-6\n",errmax*10e+6);
+	printf("MaxError = %f e-6\n",errmax*1e+6);
 }
+
+void Arti_Atan2Test()
+{
+	Uint32 tilt;
+	Sint32 atn2;
+
+	Sint32 i;
+
+	Sint32 a;
+	Sint32 b;
+	Float64 c;
+
+	Uint32	da;
+	Uint32	db;
+	Float64	dc;
+	Float64	rate;
+	Float64 errmax=0;
+
+	srand(2020);
+
+	for(i=0;i<1000000;i++){
+
+		// ƒ‰ƒ“ƒ_ƒ€¶¬
+		a = sirand();
+		b = sirand();
+
+		// CPU calculation
+		c = atan2((Float64)b,(Float64)a);
+
+		// Discrete calculation
+		atn2 = Arit_atan2(b,a);
+		dc = (Float64)atn2 / (Float64)0x20000000;
+
+		// Error check
+		rate	= fabs(dc - c);
+		if(rate >= 1e-6f){
+			// Place a breakpoint here and check for errors.
+			Uint32	check = 1;
+		}
+		if(rate > errmax){
+			errmax = rate;
+		}
+//--		printf("atan(%fl) = %fl rad error = %fl e-6\n", a ,dc,rate*10e+6);
+
+	}
+
+	printf("MaxError = %f e-6\n",errmax*1e+6);
+
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//  
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+Sint32 Float32_xxTest();
 void IntArti_Test()
 {
+	Float32_xxTest();
+
 	printf("---- START ----\n");
 
-//	IntArti_DivTest();
+	// **** g—p‚·‚é•û‚ğƒRƒƒ“ƒgŠO‚µ‚Ä‰º‚³‚¢B****
+//	Arti_AtanTest();	// atan(y/x)	(y/x) = 0`0.999999
 
-	// atan()
-	Arti_AtanTest();
+	Arti_Atan2Test();	// atan2(y,x)	 y = intmin`Intmax ,x = intmin`Intmax
 
 	printf("---- END ----\n");
 

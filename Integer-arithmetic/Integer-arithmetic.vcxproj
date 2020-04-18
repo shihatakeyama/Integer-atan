@@ -87,6 +87,7 @@
   <ItemGroup>
     <ClCompile Include="Arit_Uint32.cpp" />
     <ClCompile Include="Integer-arithmetic.cpp" />
+    <ClCompile Include="My_arithmetic.cpp" />
     <ClCompile Include="rand.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
